@@ -6,360 +6,96 @@
 <title>SpecificationsDoc — DevTemplate</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --ink: #0f1117;
-    --ink-light: #4a5060;
-    --ink-faint: #9aa0b0;
-    --accent: #1a6bff;
-    --accent-dim: #d6e5ff;
-    --accent-glow: rgba(26,107,255,0.10);
-    --surface: #ffffff;
-    --surface-2: #f5f7fb;
-    --surface-3: #eef1f8;
-    --border: #dde2ed;
-    --sidebar-w: 240px;
-    --header-h: 56px;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 14px;
-    line-height: 1.8;
-    color: var(--ink);
-    background: var(--surface);
-    display: flex;
-    min-height: 100vh;
-  }
-
-  /* ─── Sidebar ─── */
-  #sidebar {
-    width: var(--sidebar-w);
-    height: 100vh;
-    position: fixed;
-    top: 0; left: 0;
-    background: var(--ink);
-    color: #e2e8f0;
-    overflow-y: auto;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-  }
-  #sidebar-logo {
-    padding: 24px 20px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  #sidebar-logo .repo {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--accent);
-    margin-bottom: 6px;
-  }
-  #sidebar-logo .title {
-    font-family: 'Syne', sans-serif;
-    font-size: 17px;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.2;
-  }
-  #sidebar nav { padding: 16px 0 24px; flex: 1; }
-  .nav-section-label {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.28);
-    padding: 10px 20px 4px;
-  }
-  .nav-folder {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 20px;
-    font-size: 13px;
-    color: rgba(255,255,255,0.85);
-    font-weight: 600;
-    border-left: 2px solid var(--accent);
-    background: rgba(26,107,255,0.1);
-    cursor: default;
-  }
-  .nav-folder .icon { font-size: 14px; }
-  .nav-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 20px 7px 32px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.52);
-    text-decoration: none;
-    border-left: 2px solid transparent;
-    transition: all 0.15s;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .nav-link:hover { color: #fff; background: rgba(255,255,255,0.06); border-left-color: var(--accent); }
-  .nav-link .icon { font-size: 12px; flex-shrink: 0; }
-  .nav-other {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 20px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.4);
-    text-decoration: none;
-    transition: all 0.15s;
-  }
-  .nav-other:hover { color: rgba(255,255,255,0.75); }
-
-  /* ─── Main ─── */
-  #main { margin-left: var(--sidebar-w); flex: 1; }
-
-  #topbar {
-    height: var(--header-h);
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 48px;
-    position: sticky;
-    top: 0; z-index: 50;
-    gap: 8px;
-  }
-  .breadcrumb {
-    font-size: 12px;
-    color: var(--ink-faint);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex: 1;
-    font-family: 'DM Mono', monospace;
-  }
-  .breadcrumb a { color: var(--accent); text-decoration: none; }
-  .breadcrumb a:hover { text-decoration: underline; }
-  .breadcrumb .sep { color: var(--ink-faint); }
-  .breadcrumb .current { color: var(--ink); }
-  .updated-badge {
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    color: var(--ink-faint);
-  }
-
-  /* ─── Content ─── */
-  #content {
-    max-width: 840px;
-    margin: 0 auto;
-    padding: 48px 48px 120px;
-  }
-
-  /* ─── Section Header ─── */
-  .section-header {
-    background: var(--ink);
-    margin: -48px -48px 40px;
-    padding: 48px 48px 40px;
-    position: relative;
-    overflow: hidden;
-  }
-  .section-header::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -40px;
-    width: 260px; height: 260px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(26,107,255,0.2) 0%, transparent 70%);
-  }
-  .section-header .eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 10px;
-  }
-  .section-header h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 32px;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 6px;
-    position: relative;
-    z-index: 1;
-  }
-  .section-header .sub {
-    font-size: 13px;
-    color: rgba(255,255,255,0.45);
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ─── Stats bar ─── */
-  .stats-bar {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 32px;
-    padding: 16px 20px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-  }
-  .stat { display: flex; flex-direction: column; gap: 2px; }
-  .stat .k { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
-  .stat .v { font-size: 18px; font-weight: 700; color: var(--ink); font-family: 'Syne', sans-serif; }
-
-  /* ─── File grid ─── */
-  .file-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-bottom: 40px;
-  }
-  .file-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 20px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    text-decoration: none;
-    color: inherit;
-    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-    background: var(--surface);
-  }
-  .file-card:hover {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow);
-    background: var(--surface-2);
-  }
-  .file-icon {
-    width: 40px; height: 40px;
-    background: var(--accent-dim);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .file-info { flex: 1; min-width: 0; }
-  .file-name {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--accent);
-    margin-bottom: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .file-title {
-    font-size: 13px;
-    color: var(--ink);
-    font-weight: 600;
-    margin-bottom: 2px;
-  }
-  .file-meta { font-size: 12px; color: var(--ink-faint); }
-  .file-arrow {
-    color: var(--ink-faint);
-    font-size: 16px;
-    transition: transform 0.15s, color 0.15s;
-  }
-  .file-card:hover .file-arrow { transform: translateX(4px); color: var(--accent); }
-
-  /* ─── Empty state ─── */
-  .empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--ink-faint);
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-  }
-  .empty .icon { font-size: 36px; margin-bottom: 12px; }
-  .empty p { font-size: 13px; }
-
-  /* ─── Footer ─── */
-  .page-footer {
-    margin-top: 64px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-    font-size: 12px;
-    color: var(--ink-faint);
-    display: flex;
-    justify-content: space-between;
-    font-family: 'DM Mono', monospace;
-  }
-
-  #sidebar::-webkit-scrollbar { width: 4px; }
-  #sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+  :root{--ink:#0f1117;--ink-light:#4a5060;--ink-faint:#9aa0b0;--accent:#1a6bff;--accent-dim:#d6e5ff;--accent-glow:rgba(26,107,255,0.10);--surface:#fff;--surface-2:#f5f7fb;--surface-3:#eef1f8;--border:#dde2ed;--sidebar-w:240px;--header-h:56px}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Noto Sans JP',sans-serif;font-size:14px;line-height:1.8;color:var(--ink);background:var(--surface);display:flex;min-height:100vh}
+  #sidebar{width:var(--sidebar-w);height:100vh;position:fixed;top:0;left:0;background:var(--ink);color:#e2e8f0;overflow-y:auto;z-index:100;display:flex;flex-direction:column}
+  #sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+  #sidebar-logo .repo{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--accent);margin-bottom:6px}
+  #sidebar-logo .title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#fff;line-height:1.2}
+  #sidebar nav{padding:16px 0 24px;flex:1}
+  .nav-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.28);padding:10px 20px 4px}
+  .nav-folder{display:flex;align-items:center;gap:8px;padding:8px 20px;font-size:13px;color:rgba(255,255,255,.85);font-weight:600;border-left:2px solid var(--accent);background:rgba(26,107,255,.1)}
+  .nav-link{display:flex;align-items:center;gap:8px;padding:7px 20px 7px 32px;font-size:12px;color:rgba(255,255,255,.52);text-decoration:none;border-left:2px solid transparent;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nav-link:hover{color:#fff;background:rgba(255,255,255,.06);border-left-color:var(--accent)}
+  .nav-other{display:flex;align-items:center;gap:8px;padding:7px 20px;font-size:12px;color:rgba(255,255,255,.4);text-decoration:none;transition:all .15s}
+  .nav-other:hover{color:rgba(255,255,255,.75)}
+  #main{margin-left:var(--sidebar-w);flex:1}
+  #topbar{height:var(--header-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 48px;position:sticky;top:0;z-index:50;gap:8px}
+  .breadcrumb{font-size:12px;color:var(--ink-faint);display:flex;align-items:center;gap:6px;flex:1;font-family:'DM Mono',monospace}
+  .breadcrumb a{color:var(--accent);text-decoration:none}
+  .breadcrumb a:hover{text-decoration:underline}
+  .breadcrumb .current{color:var(--ink)}
+  .updated-badge{font-size:11px;font-family:'DM Mono',monospace;color:var(--ink-faint)}
+  #content{max-width:840px;margin:0 auto;padding:48px 48px 120px}
+  .section-header{background:var(--ink);margin:-48px -48px 40px;padding:48px 48px 40px;position:relative;overflow:hidden}
+  .section-header::before{content:'';position:absolute;top:-60px;right:-40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(26,107,255,.2) 0%,transparent 70%)}
+  .section-header .eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .section-header h1{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#fff;margin-bottom:6px;position:relative;z-index:1}
+  .section-header .sub{font-size:13px;color:rgba(255,255,255,.45);position:relative;z-index:1}
+  .stats-bar{display:flex;gap:24px;margin-bottom:32px;padding:16px 20px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px}
+  .stat{display:flex;flex-direction:column;gap:2px}
+  .stat .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+  .stat .v{font-size:18px;font-weight:700;color:var(--ink);font-family:'Syne',sans-serif}
+  .file-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:40px}
+  .file-card{display:flex;align-items:center;gap:16px;padding:16px 20px;border:1px solid var(--border);border-radius:8px;text-decoration:none;color:inherit;transition:border-color .15s,box-shadow .15s,background .15s;background:var(--surface)}
+  .file-card:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);background:var(--surface-2)}
+  .file-icon{width:40px;height:40px;background:var(--accent-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .file-info{flex:1;min-width:0}
+  .file-name{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--accent);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .file-title{font-size:13px;color:var(--ink);font-weight:600;margin-bottom:2px}
+  .file-meta{font-size:12px;color:var(--ink-faint)}
+  .file-arrow{color:var(--ink-faint);font-size:16px;transition:transform .15s,color .15s}
+  .file-card:hover .file-arrow{transform:translateX(4px);color:var(--accent)}
+  .empty{text-align:center;padding:60px 20px;color:var(--ink-faint);border:1px dashed var(--border);border-radius:8px}
+  .page-footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--border);font-size:12px;color:var(--ink-faint);display:flex;justify-content:space-between;font-family:'DM Mono',monospace}
+  #sidebar::-webkit-scrollbar{width:4px}
+  #sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
 </style>
 </head>
 <body>
-
 <aside id="sidebar">
   <div id="sidebar-logo">
     <div class="repo">EQlesia / DevTemplate</div>
     <div class="title">Dev<br>Template</div>
   </div>
   <nav>
-    <div class="nav-section-label">ドキュメント</div>
-    <div class="nav-folder"><span class="icon">📂</span> SpecificationsDoc</div>
-        <a class="nav-link" href="GUIAppSpecificationTemplateForWin.html" title="プロダクト仕様書 — Windows GUIアプリ(Rustメインを想定)"><span class="icon">📄</span>プロダクト仕様書 — Windows GUIアプリ(Ru…</a>
+    <div class="nav-label">ドキュメント</div>
+    <div class="nav-folder"><span>📂</span> SpecificationsDoc</div>
+    <a class="nav-link" href="GUIAppSpecificationTemplateForWin.html" title="プロダクト仕様書 — WindowsGUIアプリ"><span>📄</span>プロダクト仕様書 — WindowsGUIアプリ</a>
     <div style="height:16px"></div>
-    <div class="nav-section-label">リポジトリ</div>
+    <div class="nav-label">リポジトリ</div>
     <a class="nav-other" href="../index.html">🏠 ルートへ戻る</a>
     <a class="nav-other" href="https://github.com/EQlesia/DevTemplate" target="_blank">⎋ GitHub</a>
   </nav>
 </aside>
-
 <div id="main">
   <div id="topbar">
     <div class="breadcrumb">
       <a href="../index.html">DevTemplate</a>
-      <span class="sep">/</span>
+      <span>/</span>
       <span class="current">SpecificationsDoc</span>
     </div>
-    <span class="updated-badge">更新: <span id="updated-at">2026/03/05 23:11 JST</span></span>
+    <span class="updated-badge">更新: 2026/03/05 23:22 JST</span>
   </div>
-
   <div id="content">
     <div class="section-header">
       <div class="eyebrow">EQlesia / DevTemplate</div>
       <h1>SpecificationsDoc</h1>
       <p class="sub">仕様書テンプレート集 — Windows GUI アプリ・その他</p>
     </div>
-
     <div class="stats-bar">
-      <div class="stat">
-        <span class="k">ファイル数</span>
-        <span class="v" id="file-count">1</span>
-      </div>
-      <div class="stat">
-        <span class="k">最終更新</span>
-        <span class="v" style="font-size:13px;padding-top:4px" id="last-updated">2026/03/05 23:11 JST</span>
-      </div>
-      <div class="stat">
-        <span class="k">フォルダ</span>
-        <span class="v">SpecificationsDoc/</span>
-      </div>
+      <div class="stat"><span class="k">ファイル数</span><span class="v">1</span></div>
+      <div class="stat"><span class="k">最終更新</span><span class="v" style="font-size:13px;padding-top:4px">2026/03/05 23:22 JST</span></div>
+      <div class="stat"><span class="k">フォルダ</span><span class="v" style="font-size:13px;padding-top:4px">SpecificationsDoc/</span></div>
     </div>
-
-    <div class="file-grid" id="file-grid">
-            <a class="file-card" href="GUIAppSpecificationTemplateForWin.html">
-        <div class="file-icon">📄</div>
-        <div class="file-info">
-          <div class="file-name">GUIAppSpecificationTemplateForWin.html</div>
-          <div class="file-title">プロダクト仕様書 — Windows GUIアプリ(Rustメインを想定)</div>
-          <div class="file-meta">更新: 2026/03/05 23:11 JST</div>
-        </div>
-        <div class="file-arrow">→</div>
-      </a>
-    </div>
-
+    <div class="file-grid"><a class="file-card" href="GUIAppSpecificationTemplateForWin.html"><div class="file-icon">📄</div><div class="file-info"><div class="file-name">GUIAppSpecificationTemplateForWin.html</div><div class="file-title">プロダクト仕様書 — WindowsGUIアプリ</div><div class="file-meta">更新: 2026/03/05 23:22 JST</div></div><div class="file-arrow">→</div></a></div>
     <div class="page-footer">
       <span>EQlesia/DevTemplate — SpecificationsDoc</span>
       <span>自動生成 by GitHub Actions</span>
     </div>
   </div>
 </div>
-
 </body>
 </html>
