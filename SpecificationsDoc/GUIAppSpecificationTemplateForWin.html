@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プロダクト仕様書 — Windows GUIアプリ</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1117;
+    --ink-light: #4a5060;
+    --ink-faint: #9aa0b0;
+    --accent: #1a6bff;
+    --accent-dim: #d6e5ff;
+    --accent-glow: rgba(26,107,255,0.12);
+    --surface: #ffffff;
+    --surface-2: #f5f7fb;
+    --surface-3: #eef1f8;
+    --border: #dde2ed;
+    --code-bg: #f0f2f8;
+    --code-fg: #c7254e;
+    --success: #16a34a;
+    --warn: #d97706;
+    --sidebar-w: 260px;
+    --header-h: 56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--ink);
+    background: var(--surface);
+    display: flex;
+  }
+
+  /* ─── Sidebar ─── */
+  #sidebar {
+    width: var(--sidebar-w);
+    height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    background: var(--ink);
+    color: #e2e8f0;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  #sidebar-logo .label {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  #sidebar-logo .title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  #sidebar nav { padding: 12px 0 24px; flex: 1; }
+
+  .nav-group { margin-bottom: 4px; }
+  .nav-group-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    padding: 12px 20px 4px;
+  }
+  .nav-item {
+    display: block;
+    padding: 7px 20px 7px 24px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.62);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .nav-item:hover, .nav-item.active {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+    border-left-color: var(--accent);
+  }
+  .nav-item.sub {
+    padding-left: 36px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+  }
+  .nav-item.sub:hover { color: rgba(255,255,255,0.8); }
+
+  /* ─── Main ─── */
+  #main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-height: 100vh;
+  }
+
+  /* ─── Top Header ─── */
+  #topbar {
+    height: var(--header-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 48px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    gap: 12px;
+  }
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--ink-faint);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+  .breadcrumb span { color: var(--ink); font-weight: 500; }
+  .status-badge {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    letter-spacing: 0.05em;
+  }
+  .ver-badge {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid #bfd4ff;
+  }
+
+  /* ─── Content ─── */
+  #content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 48px 120px;
+  }
+
+  /* ─── Hero / Cover ─── */
+  .cover {
+    background: var(--ink);
+    margin: -48px -48px 64px;
+    padding: 64px 48px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -60px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(26,107,255,0.25) 0%, transparent 70%);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 20%;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(26,107,255,0.1) 0%, transparent 70%);
+  }
+  .cover-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .cover-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .cover-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 40px;
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-meta-item {
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.03);
+  }
+  .cover-meta-item .k {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 4px;
+  }
+  .cover-meta-item .v {
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+  }
+  .editable { border-bottom: 1px dashed rgba(255,255,255,0.3); }
+  .editable-light { border-bottom: 1px dashed var(--border); }
+
+  /* ─── Sections ─── */
+  .section { margin-bottom: 72px; }
+
+  h1.sh {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  h1.sh .num {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  h2.sh {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 32px 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h2.sh::before {
+    content: '';
+    display: block;
+    width: 3px; height: 16px;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  h3.sh {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink-light);
+    margin: 24px 0 10px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.03em;
+  }
+
+  p { margin-bottom: 12px; color: var(--ink-light); }
+
+  /* ─── Placeholder ─── */
+  .ph {
+    background: var(--surface-2);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    color: var(--ink-faint);
+    font-size: 13px;
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+
+  /* ─── Info Table ─── */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+  .info-table th, .info-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+  .info-table thead th {
+    background: var(--ink);
+    color: #fff;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+  }
+  .info-table tbody tr:nth-child(odd) td:first-child,
+  .info-table.kv tbody td:first-child {
+    background: var(--surface-3);
+    font-weight: 600;
+    color: var(--ink);
+    width: 32%;
+  }
+  .info-table tbody tr:hover td { background: var(--accent-glow); }
+  .info-table.kv tbody td:last-child { color: var(--ink-light); }
+  .info-table .placeholder-cell { color: var(--ink-faint); font-style: italic; }
+
+  /* ─── Dir Table ─── */
+  .dir-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+  .dir-table th, .dir-table td {
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+  }
+  .dir-table thead th {
+    background: var(--ink);
+    color: #fff;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .dir-table tbody tr:nth-child(even) td { background: var(--surface-2); }
+  .dir-table .path {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: #1a6bff;
+    white-space: nowrap;
+  }
+  .dir-table .desc { color: var(--ink-light); }
+
+  /* ─── Code inline ─── */
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  .code-block {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    background: var(--ink);
+    color: #e2e8f0;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 12px 0 20px;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+  .code-block .comment { color: #64748b; }
+  .code-block .cmd { color: #7dd3fc; }
+  .code-block .flag { color: #fbbf24; }
+
+  /* ─── Bullets ─── */
+  ul.spec-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 16px;
+  }
+  ul.spec-list li {
+    padding: 6px 0 6px 20px;
+    position: relative;
+    color: var(--ink-light);
+    font-size: 13px;
+    border-bottom: 1px solid var(--surface-3);
+  }
+  ul.spec-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 11px;
+    top: 8px;
+  }
+
+  /* ─── Screen list ─── */
+  .screen-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .screen-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .screen-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .screen-name { font-weight: 700; margin-bottom: 2px; }
+  .screen-desc { font-size: 13px; color: var(--ink-light); }
+
+  /* ─── Priority badge ─── */
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+  .badge-must  { background: #fee2e2; color: #991b1b; }
+  .badge-should{ background: #fef3c7; color: #92400e; }
+  .badge-nice  { background: #dcfce7; color: #166534; }
+  .badge-todo  { background: var(--surface-3); color: var(--ink-faint); }
+  .badge-ver   { background: var(--accent-dim); color: var(--accent); }
+
+  /* ─── Divider ─── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  /* ─── Revision history ─── */
+  .rev-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .rev-table th, .rev-table td { padding: 10px 14px; border: 1px solid var(--border); }
+  .rev-table thead th { background: var(--ink); color: #fff; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .rev-table tbody td:first-child { font-family: 'DM Mono', monospace; color: var(--accent); }
+
+  /* ─── Print ─── */
+  @media print {
+    #sidebar { display: none; }
+    #main { margin-left: 0; }
+    #topbar { display: none; }
+    .cover { margin: 0 0 40px; }
+  }
+
+  /* ─── Scrollbar ─── */
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-track { background: transparent; }
+  #sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ─── Sidebar ─── -->
+<aside id="sidebar">
+  <div id="sidebar-logo">
+    <div class="label">仕様書テンプレート</div>
+    <div class="title">Windows GUI<br>アプリ</div>
+  </div>
+  <nav>
+    <div class="nav-group">
+      <div class="nav-group-label">概要</div>
+      <a class="nav-item" href="#abstract">1. Abstract</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">設計</div>
+      <a class="nav-item" href="#architecture">2. アーキテクチャ</a>
+      <a class="nav-item sub" href="#arch-stack">技術スタック</a>
+      <a class="nav-item" href="#design-policy">3. 設計方針</a>
+      <a class="nav-item sub" href="#perf">パフォーマンス要件</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">仕様</div>
+      <a class="nav-item" href="#ui-spec">4. UI仕様</a>
+      <a class="nav-item sub" href="#screens">画面一覧</a>
+      <a class="nav-item" href="#func-spec">5. 機能仕様</a>
+      <a class="nav-item sub" href="#func-list">機能一覧</a>
+      <a class="nav-item" href="#data-spec">6. データ構造仕様</a>
+      <a class="nav-item" href="#infra-spec">7. インフラ仕様</a>
+      <a class="nav-item" href="#other-spec">8. その他仕様</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">開発</div>
+      <a class="nav-item" href="#dev-guide">9. 開発時の要項</a>
+      <a class="nav-item sub" href="#dir-structure">ディレクトリ構造</a>
+      <a class="nav-item sub" href="#build-artifacts">ビルド成果物</a>
+      <a class="nav-item sub" href="#install-dir">インストール先</a>
+      <a class="nav-item sub" href="#dev-commands">開発コマンド</a>
+      <a class="nav-item sub" href="#docs">詳細ドキュメント</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">記録</div>
+      <a class="nav-item" href="#revision">改訂履歴</a>
+    </div>
+  </nav>
+</aside>
+
+<!-- ─── Main ─── -->
+<div id="main">
+  <div id="topbar">
+    <div class="breadcrumb">
+      プロダクト仕様書 › <span contenteditable="true">プロダクト名称</span>
+    </div>
+    <span class="ver-badge" contenteditable="true">v0.1.0</span>
+    <span class="status-badge" contenteditable="true">Draft</span>
+  </div>
+
+  <div id="content">
+
+    <!-- Cover -->
+    <div class="cover">
+      <div class="cover-eyebrow">Product Specification Document</div>
+      <h1 class="cover-title" contenteditable="true">プロダクト名称</h1>
+      <p class="cover-sub">Windows GUI Application — 仕様書</p>
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <div class="k">バージョン</div>
+          <div class="v" contenteditable="true">0.1.0</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="k">作成日</div>
+          <div class="v" id="today"></div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="k">作成者</div>
+          <div class="v" contenteditable="true">（記入）</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="k">最終更新</div>
+          <div class="v" id="updated"></div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="k">ステータス</div>
+          <div class="v" contenteditable="true">Draft</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="k">対象OS</div>
+          <div class="v">Windows 10 / 11 x64</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Abstract -->
+    <section class="section" id="abstract">
+      <h1 class="sh"><span class="num">01</span> Abstract</h1>
+      <div class="ph" contenteditable="true">このプロダクトが何をするものか、誰のためのものか、なぜ作るのかを 3〜5 文で記述します。</div>
+
+      <h2 class="sh" id="abstract-purpose">目的・背景</h2>
+      <div class="ph" contenteditable="true">解決したい課題や開発の背景を記述してください。</div>
+
+      <h2 class="sh">対象ユーザー</h2>
+      <div class="ph" contenteditable="true">主要なペルソナや対象ユーザーの属性・スキルレベルを記述してください。</div>
+
+      <h2 class="sh">スコープ</h2>
+      <table class="info-table kv">
+        <tbody>
+          <tr><td>In Scope</td><td class="placeholder-cell" contenteditable="true">（本プロジェクトで対応すること）</td></tr>
+          <tr><td>Out of Scope</td><td class="placeholder-cell" contenteditable="true">（対応しないこと・将来検討事項）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 2. Architecture -->
+    <section class="section" id="architecture">
+      <h1 class="sh"><span class="num">02</span> アーキテクチャ</h1>
+      <div class="ph" contenteditable="true">アーキテクチャ概要図（Figma / draw.io / Mermaid 等）を添付、またはテキストで説明してください。</div>
+
+      <h2 class="sh" id="arch-stack">技術スタック</h2>
+      <table class="info-table kv">
+        <tbody>
+          <tr><td>フロントエンド</td><td contenteditable="true" class="placeholder-cell">例: React / Vue / WPF</td></tr>
+          <tr><td>バックエンド / コア</td><td contenteditable="true" class="placeholder-cell">例: Rust / C# / Python</td></tr>
+          <tr><td>フレームワーク</td><td contenteditable="true" class="placeholder-cell">例: Tauri / Electron / WinForms</td></tr>
+          <tr><td>DB / ストレージ</td><td contenteditable="true" class="placeholder-cell">例: SQLite / LevelDB / ファイル</td></tr>
+          <tr><td>ビルドツール</td><td contenteditable="true" class="placeholder-cell">例: Docker / cargo / MSBuild</td></tr>
+          <tr><td>対応 OS</td><td>Windows 10 / 11 (x64)</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="sh">コンポーネント構成</h2>
+      <div class="ph" contenteditable="true">主要コンポーネントと責務を記述してください。（例: UI層 / ビジネスロジック層 / データアクセス層）</div>
+    </section>
+
+    <!-- 3. Design Policy -->
+    <section class="section" id="design-policy">
+      <h1 class="sh"><span class="num">03</span> 設計方針</h1>
+
+      <h2 class="sh">基本方針</h2>
+      <ul class="spec-list">
+        <li contenteditable="true">オフライン優先：ネット接続なしでも全機能が動作すること</li>
+        <li contenteditable="true">シングルバイナリ配布：.exe 1ファイルで動作可能なこと</li>
+        <li contenteditable="true">最小権限：管理者権限不要で動作すること</li>
+        <li contenteditable="true">（追加）</li>
+      </ul>
+
+      <h2 class="sh" id="perf">パフォーマンス要件</h2>
+      <table class="info-table kv">
+        <tbody>
+          <tr><td>起動時間</td><td contenteditable="true" class="placeholder-cell">例: 3秒以内</td></tr>
+          <tr><td>UIレスポンス</td><td contenteditable="true" class="placeholder-cell">例: 操作から 200ms 以内に反応</td></tr>
+          <tr><td>メモリ使用量</td><td contenteditable="true" class="placeholder-cell">例: 通常動作時 200MB 以下</td></tr>
+          <tr><td>対応データ量</td><td contenteditable="true" class="placeholder-cell">例: レコード 100万件まで</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="sh">セキュリティ方針</h2>
+      <div class="ph" contenteditable="true">データ暗号化・認証・権限管理についての方針を記述してください。</div>
+
+      <h2 class="sh">エラーハンドリング方針</h2>
+      <div class="ph" contenteditable="true">例外処理・ログ出力・ユーザー通知の基本方針を記述してください。</div>
+    </section>
+
+    <!-- 4. UI Spec -->
+    <section class="section" id="ui-spec">
+      <h1 class="sh"><span class="num">04</span> UI仕様</h1>
+
+      <h2 class="sh" id="screens">画面一覧</h2>
+      <div id="screen-list">
+        <div class="screen-card">
+          <span class="screen-id">SCR-001</span>
+          <div>
+            <div class="screen-name" contenteditable="true">メイン画面</div>
+            <div class="screen-desc" contenteditable="true">起動直後に表示されるメイン画面。主要機能へのナビゲーションを提供する。</div>
+          </div>
+        </div>
+        <div class="screen-card">
+          <span class="screen-id">SCR-002</span>
+          <div>
+            <div class="screen-name" contenteditable="true">設定画面</div>
+            <div class="screen-desc" contenteditable="true">アプリケーション全体の設定を管理する画面。</div>
+          </div>
+        </div>
+        <div class="screen-card">
+          <span class="screen-id">SCR-003</span>
+          <div>
+            <div class="screen-name" contenteditable="true">（画面名）</div>
+            <div class="screen-desc" contenteditable="true">（説明）</div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sh">画面遷移</h2>
+      <div class="ph" contenteditable="true">画面遷移図を添付してください。（Figma / draw.io / Mermaid 等のリンクまたは図）</div>
+
+      <h2 class="sh">共通 UI ルール</h2>
+      <ul class="spec-list">
+        <li contenteditable="true">フォント：（例: メイリオ / Yu Gothic UI）</li>
+        <li contenteditable="true">テーマ：（例: ライトモード、ダークモード対応）</li>
+        <li contenteditable="true">アイコン：（例: Material Icons / Fluent UI Icons）</li>
+        <li contenteditable="true">エラー表示：（例: ダイアログ / インライン / ステータスバー）</li>
+        <li contenteditable="true">（追加）</li>
+      </ul>
+    </section>
+
+    <!-- 5. Functional Spec -->
+    <section class="section" id="func-spec">
+      <h1 class="sh"><span class="num">05</span> 機能仕様</h1>
+
+      <h2 class="sh" id="func-list">機能一覧</h2>
+      <table class="info-table">
+        <thead>
+          <tr><th>機能ID</th><th>機能名</th><th>概要</th><th>優先度</th><th>状態</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>FT-001</code></td>
+            <td contenteditable="true">（機能名）</td>
+            <td contenteditable="true" class="placeholder-cell">（概要）</td>
+            <td><span class="badge badge-must">Must</span></td>
+            <td><span class="badge badge-todo">未着手</span></td>
+          </tr>
+          <tr>
+            <td><code>FT-002</code></td>
+            <td contenteditable="true">（機能名）</td>
+            <td contenteditable="true" class="placeholder-cell">（概要）</td>
+            <td><span class="badge badge-should">Should</span></td>
+            <td><span class="badge badge-todo">未着手</span></td>
+          </tr>
+          <tr>
+            <td><code>FT-003</code></td>
+            <td contenteditable="true">（機能名）</td>
+            <td contenteditable="true" class="placeholder-cell">（概要）</td>
+            <td><span class="badge badge-nice">Nice</span></td>
+            <td><span class="badge badge-todo">未着手</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="sh">機能詳細</h2>
+      <h3 class="sh">FT-001 — （機能名）</h3>
+      <table class="info-table kv">
+        <tbody>
+          <tr><td>概要</td><td contenteditable="true" class="placeholder-cell">機能の説明</td></tr>
+          <tr><td>前提条件</td><td contenteditable="true" class="placeholder-cell">この機能が動作するための前提</td></tr>
+          <tr><td>正常系フロー</td><td contenteditable="true" class="placeholder-cell">1. ステップ1<br>2. ステップ2<br>3. ステップ3</td></tr>
+          <tr><td>異常系 / 例外</td><td contenteditable="true" class="placeholder-cell">エラーケースと挙動</td></tr>
+          <tr><td>備考</td><td contenteditable="true" class="placeholder-cell">（任意）</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 6. Data Spec -->
+    <section class="section" id="data-spec">
+      <h1 class="sh"><span class="num">06</span> データ構造仕様</h1>
+
+      <h2 class="sh">データモデル概要</h2>
+      <div class="ph" contenteditable="true">ER図または概念モデルを添付してください。</div>
+
+      <h2 class="sh">主要エンティティ</h2>
+      <h3 class="sh" contenteditable="true">（エンティティ名）</h3>
+      <table class="info-table">
+        <thead>
+          <tr><th>フィールド名</th><th>型</th><th>制約</th><th>説明</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>id</code></td><td>INTEGER</td><td>PK / NOT NULL</td><td>主キー（自動採番）</td>
+          </tr>
+          <tr>
+            <td><code>name</code></td><td>TEXT</td><td>NOT NULL</td><td>名称</td>
+          </tr>
+          <tr>
+            <td><code>created_at</code></td><td>DATETIME</td><td>NOT NULL</td><td>作成日時</td>
+          </tr>
+          <tr>
+            <td contenteditable="true" class="placeholder-cell">（追加）</td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="sh">設定ファイル・ユーザーデータ形式</h2>
+      <div class="ph" contenteditable="true">JSON / TOML / SQLite 等、保存形式と保存先パスを記述してください。</div>
+    </section>
+
+    <!-- 7. Infra Spec -->
+    <section class="section" id="infra-spec">
+      <h1 class="sh"><span class="num">07</span> インフラ仕様</h1>
+
+      <h2 class="sh">動作環境</h2>
+      <table class="info-table kv">
+        <tbody>
+          <tr><td>OS</td><td>Windows 10 / 11 (x64)</td></tr>
+          <tr><td>CPU</td><td contenteditable="true" class="placeholder-cell">例: Intel Core i3 以上</td></tr>
+          <tr><td>RAM</td><td contenteditable="true" class="placeholder-cell">例: 4GB 以上推奨</td></tr>
+          <tr><td>ストレージ</td><td contenteditable="true" class="placeholder-cell">例: インストール 200MB + データ領域</td></tr>
+          <tr><td>ランタイム</td><td contenteditable="true" class="placeholder-cell">例: .NET 8 Runtime / WebView2</td></tr>
+          <tr><td>ネットワーク</td><td contenteditable="true" class="placeholder-cell">例: オフライン動作可 / 初回認証のみ要接続</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="sh">インストール先</h2>
+      <div class="code-block">
+        <span class="comment"># インストールディレクトリ</span><br>
+        <span class="cmd">C:\Program Files\[AppName]\</span><br><br>
+        <span class="comment"># ユーザーデータ</span><br>
+        <span class="cmd">%APPDATA%\[AppName]\</span>
+      </div>
+
+      <h2 class="sh">更新・配布方法</h2>
+      <div class="ph" contenteditable="true">自動更新の有無・配布チャネル（例: GitHub Releases / 社内配布）を記述してください。</div>
+    </section>
+
+    <!-- 8. Other Spec -->
+    <section class="section" id="other-spec">
+      <h1 class="sh"><span class="num">08</span> その他仕様</h1>
+
+      <h2 class="sh">ロギング</h2>
+      <div class="ph" contenteditable="true">ログレベル・出力先・ローテーション方針を記述してください。</div>
+
+      <h2 class="sh">国際化（i18n）</h2>
+      <div class="ph" contenteditable="true">対応言語・言語ファイルの管理方法を記述してください。</div>
+
+      <h2 class="sh">アクセシビリティ</h2>
+      <div class="ph" contenteditable="true">スクリーンリーダー対応・キーボード操作等の方針を記述してください。</div>
+
+      <h2 class="sh">ライセンス・著作権</h2>
+      <div class="ph" contenteditable="true">使用 OSS のライセンス一覧・商標に関する注意事項を記述してください。</div>
+    </section>
+
+    <!-- 9. Dev Guide -->
+    <section class="section" id="dev-guide">
+      <h1 class="sh"><span class="num">09</span> 開発時の要項</h1>
+
+      <h2 class="sh" id="dir-structure">開発ディレクトリ構造</h2>
+      <table class="dir-table">
+        <thead><tr><th>パス</th><th>説明</th></tr></thead>
+        <tbody>
+          <tr><td class="path">/dist/</td><td class="desc" contenteditable="true">ビルド成果物の出力先</td></tr>
+          <tr><td class="path">/Userdata/</td><td class="desc" contenteditable="true">開発時テスト用ユーザーデータ（本番と分離）</td></tr>
+          <tr><td class="path">/src/</td><td class="desc" contenteditable="true">メインのフロントエンドソース</td></tr>
+          <tr><td class="path">/src-tauri/</td><td class="desc" contenteditable="true">Tauri バックエンド（Tauri 使用時のみ）</td></tr>
+          <tr><td class="path">/src-[sub-lang]/</td><td class="desc" contenteditable="true">サブ言語によるサブプロジェクト（任意）</td></tr>
+          <tr><td class="path">/doc/</td><td class="desc" contenteditable="true">ドキュメント類（本仕様書含む）</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="sh" id="build-artifacts">ビルド成果物</h2>
+      <table class="dir-table">
+        <thead><tr><th>パス</th><th>説明</th></tr></thead>
+        <tbody>
+          <tr><td class="path">/README.txt</td><td class="desc" contenteditable="true">ユーザー向けリドミ（使い方・注意事項）</td></tr>
+          <tr><td class="path">/icon.ico</td><td class="desc" contenteditable="true">アプリアイコン</td></tr>
+          <tr><td class="path">/[app_name].exe</td><td class="desc" contenteditable="true">アプリケーション本体</td></tr>
+          <tr><td class="path">/check.??</td><td class="desc" contenteditable="true">データ整合性チェッカー</td></tr>
+          <tr><td class="path">/setup/INSTALL.exe</td><td class="desc" contenteditable="true">インストーラー</td></tr>
+          <tr><td class="path">/setup/UNINST.exe</td><td class="desc" contenteditable="true">アンインストーラー</td></tr>
+          <tr><td class="path">/setup/config/</td><td class="desc" contenteditable="true">セットアップ設定ファイル群</td></tr>
+          <tr><td class="path">/setup/ptclpi/</td><td class="desc" contenteditable="true">プロトコル・PI 関連ファイル</td></tr>
+          <tr><td class="path">/setup/cursor/</td><td class="desc" contenteditable="true">カーソル／テーマリソース</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="sh" id="install-dir">インストール先ディレクトリ</h2>
+      <table class="dir-table">
+        <thead><tr><th>パス</th><th>説明</th></tr></thead>
+        <tbody>
+          <tr><td class="path">/icon.ico</td><td class="desc" contenteditable="true">アプリアイコン</td></tr>
+          <tr><td class="path">/[app_name].exe</td><td class="desc" contenteditable="true">アプリケーション本体</td></tr>
+          <tr><td class="path">/setup/INSTALL.exe</td><td class="desc" contenteditable="true">インストーラー（再インストール用）</td></tr>
+          <tr><td class="path">/setup/UNINST.exe</td><td class="desc" contenteditable="true">アンインストーラー</td></tr>
+          <tr><td class="path">/setup/config/</td><td class="desc" contenteditable="true">設定ファイル群</td></tr>
+          <tr><td class="path">/setup/ptclpi/</td><td class="desc" contenteditable="true">プロトコル・PI 関連ファイル</td></tr>
+          <tr><td class="path">/setup/cursor/</td><td class="desc" contenteditable="true">カーソル／テーマリソース</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="sh" id="dev-commands">開発コマンド</h2>
+      <div class="code-block">
+        <span class="comment"># 開発サーバー起動</span><br>
+        <span class="cmd">docker run dev</span><br><br>
+        <span class="comment"># （追加コマンドをここに記述）</span>
+      </div>
+
+      <table class="dir-table">
+        <thead><tr><th>コマンド</th><th>説明</th></tr></thead>
+        <tbody>
+          <tr><td class="path">docker run dev</td><td class="desc" contenteditable="true">開発サーバー起動</td></tr>
+          <tr><td class="path" contenteditable="true">（追加）</td><td class="desc" contenteditable="true">（説明）</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="sh" id="docs">詳細ドキュメント</h2>
+      <table class="dir-table">
+        <thead><tr><th>ドキュメント名</th><th>場所 / リンク</th><th>備考</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="desc" contenteditable="true">API リファレンス</td>
+            <td class="path" contenteditable="true">/doc/api.md</td>
+            <td class="desc" contenteditable="true">自動生成</td>
+          </tr>
+          <tr>
+            <td class="desc" contenteditable="true">変更履歴</td>
+            <td class="path" contenteditable="true">/doc/CHANGELOG.md</td>
+            <td class="desc" contenteditable="true"></td>
+          </tr>
+          <tr>
+            <td class="desc" contenteditable="true">開発セットアップガイド</td>
+            <td class="path" contenteditable="true">/doc/SETUP.md</td>
+            <td class="desc" contenteditable="true">新メンバー向け</td>
+          </tr>
+          <tr>
+            <td class="desc" contenteditable="true">（追加）</td>
+            <td class="path" contenteditable="true"></td>
+            <td class="desc" contenteditable="true"></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Revision History -->
+    <section class="section" id="revision">
+      <h1 class="sh"><span class="num">―</span> 改訂履歴</h1>
+      <table class="rev-table">
+        <thead>
+          <tr><th>バージョン</th><th>日付</th><th>作成者</th><th>変更内容</th></tr>
+        </thead>
+        <tbody id="rev-body">
+          <tr>
+            <td>0.1.0</td>
+            <td id="rev-date"></td>
+            <td contenteditable="true">（記入）</td>
+            <td contenteditable="true">初版作成</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+  // Dates
+  const today = new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'2-digit',day:'2-digit'});
+  document.getElementById('today').textContent = today;
+  document.getElementById('updated').textContent = today;
+  document.getElementById('rev-date').textContent = today;
+
+  // Active nav on scroll
+  const sections = document.querySelectorAll('section[id], .section[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navItems.forEach(n => n.classList.remove('active'));
+        const match = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
